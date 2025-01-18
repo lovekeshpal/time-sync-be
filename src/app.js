@@ -1,3 +1,4 @@
+// filepath: /e:/Development/time-sync-be/src/app.js
 const express = require("express");
 const connectDB = require("./config/db");
 const cors = require("cors");
@@ -9,8 +10,12 @@ connectDB();
 // Middleware
 app.use(express.json());
 
-// Enable CORS
-app.use(cors());
+// Enable CORS for specific clients
+const corsOptions = {
+  origin: ["http://localhost:4200"], // Add allowed origins here
+  optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+app.use(cors(corsOptions));
 
 // Routes
 const indexRouter = require("./routes/index");
