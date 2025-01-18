@@ -1,9 +1,8 @@
-// src/config/db.js
 const mongoose = require("mongoose");
 
 const connectDB = async () => {
   try {
-    await mongoose.connect("mongodb://localhost:27017/time-sync", {
+    await mongoose.connect("mongodb://127.0.0.1:27017/time-sync", {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
