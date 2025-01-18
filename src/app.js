@@ -1,6 +1,6 @@
-// src/app.js
 const express = require("express");
 const connectDB = require("./config/db");
+const cors = require("cors");
 const app = express();
 
 // Connect to MongoDB
@@ -8,6 +8,9 @@ connectDB();
 
 // Middleware
 app.use(express.json());
+
+// Enable CORS
+app.use(cors());
 
 // Routes
 const indexRouter = require("./routes/index");
