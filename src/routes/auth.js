@@ -8,10 +8,19 @@ const bcrypt = require("bcryptjs");
 router.post("/signup", async (req, res) => {
   const { username, email, password } = req.body;
   try {
-    let user = await User.findOne({ email });
+    let user = await User.findOne({ username });
     if (user) {
-      return res.status(400).json({ msg: "User already exists" });
+      return res.status(400).json({ code: 1, msg: "Username already exists" });
     }
+
+    user = await User.findOne({ email });
+    if (user) {
+      return res.status(400).json({
+        code: 2,
+        msg: "Email already associated with another account",
+      });
+    }
+
     user = new User({ username, email, password });
     await user.save();
     const payload = { user: { id: user.id } };
@@ -21,7 +30,7 @@ router.post("/signup", async (req, res) => {
     });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send("Server error");
+    res.status(500).json({ code: 3, msg: "Server error" });
   }
 });
 
@@ -31,11 +40,11 @@ router.post("/login", async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ msg: "Invalid credentials" });
+      return res.status(400).json({ code: 4, msg: "Invalid credentials" });
     }
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
-      return res.status(400).json({ msg: "Invalid credentials" });
+      return res.status(400).json({ code: 5, msg: "Invalid credentials" });
     }
     const payload = { user: { id: user.id } };
     jwt.sign(payload, "secret", { expiresIn: 360000 }, (err, token) => {
@@ -44,7 +53,7 @@ router.post("/login", async (req, res) => {
     });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send("Server error");
+    res.status(500).json({ code: 3, msg: "Server error" });
   }
 });
 
