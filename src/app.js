@@ -1,4 +1,4 @@
-// src/app.js
+require('dotenv').config();
 const express = require("express");
 const connectDB = require("./config/db");
 const cors = require("cors");
@@ -24,7 +24,7 @@ app.use(express.json());
 
 // Enable CORS for specific clients
 const corsOptions = {
-  origin: ["http://localhost:4200"],
+  origin: [process.env.CORS_ORIGINS.split(',')],
   optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));

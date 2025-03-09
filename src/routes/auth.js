@@ -24,7 +24,7 @@ router.post("/signup", async (req, res) => {
     user = new User({ username, email, password });
     await user.save();
     const payload = { user: { id: user.id } };
-    jwt.sign(payload, "secret", { expiresIn: 360000 }, (err, token) => {
+    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' }, (err, token) => {
       if (err) throw err;
       res.json({ token });
     });
@@ -47,7 +47,7 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ code: 5, msg: "Invalid credentials" });
     }
     const payload = { user: { id: user.id } };
-    jwt.sign(payload, "secret", { expiresIn: 360000 }, (err, token) => {
+    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' }, (err, token) => {
       if (err) throw err;
       res.json({ token });
     });
