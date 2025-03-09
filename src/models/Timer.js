@@ -4,6 +4,12 @@ const TimerSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
+    maxlength: 50
+  },
+  description: {
+    type: String,
+    default: "",
+    maxlength: 200
   },
   creator: {
     type: mongoose.Schema.Types.ObjectId,
@@ -12,18 +18,30 @@ const TimerSchema = new mongoose.Schema({
   },
   duration: {
     type: Number, // Duration in seconds
-    default: 0,
+    default: 300, // 5 minutes default (matching frontend)
   },
   isRunning: {
     type: Boolean,
     default: false,
+  },
+  isPublic: {
+    type: Boolean,
+    default: true,
+  },
+  theme: {
+    type: String,
+    default: "light",
+  },
+  showMilliseconds: {
+    type: Boolean,
+    default: true,
   },
   startTime: {
     type: Date,
     default: null,
   },
   pausedAt: {
-    type: Number, // Elapsed time when paused
+    type: Number, 
     default: 0,
   },
   shareId: {

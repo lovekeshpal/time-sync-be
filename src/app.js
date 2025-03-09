@@ -24,7 +24,7 @@ app.use(express.json());
 
 // Enable CORS for specific clients
 const corsOptions = {
-  origin: [process.env.CORS_ORIGINS.split(',')],
+  origin: process.env.CORS_ORIGINS.split(','),
   optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));

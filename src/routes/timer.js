@@ -1,18 +1,21 @@
 // src/routes/timer.js
 const express = require("express");
 const router = express.Router();
-const Timer = require("../models/Timer");
-const auth = require("../middleware/auth"); // Fix: Import auth middleware correctly
+const Timer = require("../models/timer");
+const auth = require("../middleware/auth");
 const { v4: uuidv4 } = require("uuid");
 
 // Create a new timer
 router.post("/", auth, async (req, res) => {
   try {
-    const { name, duration } = req.body;
+    const { name, description, duration, isPublic, theme } = req.body;
 
     const timer = new Timer({
       name,
+      description,
       duration: duration || 0,
+      isPublic,
+      theme,
       creator: req.user.id,
       shareId: uuidv4(),
     });
