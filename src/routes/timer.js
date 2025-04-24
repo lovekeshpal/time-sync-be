@@ -29,7 +29,7 @@ router.post("/", auth, async (req, res) => {
 });
 
 // Get user's timers
-router.get("/", auth, async (req, res) => {
+router.get("/list", auth, async (req, res) => {
   try {
     const timers = await Timer.find({ creator: req.user.id }).sort({
       createdAt: -1,
