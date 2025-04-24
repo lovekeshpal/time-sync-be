@@ -78,6 +78,33 @@ router.get("/share/:shareId", async (req, res) => {
   }
 });
 
+// Delete timer
+router.delete("/:id", auth, async (req, res) => {
+  try {
+    const timer = await Timer.findById(req.params.id);
+
+    if (!timer) {
+      return res.status(404).json({ msg: "Timer not found" });
+    }
+
+    // Check if timer belongs to user
+    if (timer.creator.toString() !== req.user.id) {
+      return res.status(401).json({ msg: "Not authorized" });
+    }
+
+    await Timer.findByIdAndDelete(req.params.id);
+
+    // Emit real-time update with Socket.IO (optional - to notify all clients timer was deleted)
+    const io = req.app.get("io");
+    io.to(timer.shareId).emit("timerDeleted", { timerId: req.params.id });
+
+    res.json({ msg: "Timer deleted" });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ code: 3, msg: "Server error" });
+  }
+});
+
 // Start timer
 router.put("/start/:id", auth, async (req, res) => {
   try {
@@ -120,19 +147,23 @@ router.put("/pause/:id", auth, async (req, res) => {
       return res.status(401).json({ msg: "Not authorized" });
     }
 
+    // Only process if timer is actually running
     if (timer.isRunning) {
       const currentTime = new Date();
       const elapsedTime = Math.floor((currentTime - timer.startTime) / 1000);
       timer.pausedAt = timer.pausedAt + elapsedTime;
+      timer.isRunning = false;
+
+      await timer.save();
+
+      // Emit real-time update with Socket.IO
+      const io = req.app.get("io");
+      io.to(timer.shareId).emit("timerUpdate", timer);
+      io.to(timer.shareId).emit("timerEvent", { 
+        timerId: timer.id, 
+        event: "paused" 
+      });
     }
-
-    timer.isRunning = false;
-
-    await timer.save();
-
-    // Emit real-time update with Socket.IO
-    const io = req.app.get("io");
-    io.to(timer.shareId).emit("timerUpdate", timer);
 
     res.json(timer);
   } catch (err) {
